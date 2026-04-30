@@ -117,6 +117,21 @@ const elements = {
   compareStats: document.getElementById("compareStats"),
 };
 
+function setupUiMode() {
+  const isServerMode = DATA_URL.startsWith("/api/");
+  if (!isServerMode) {
+    return;
+  }
+
+  const fileButton = document.querySelector("label[for='filePicker']");
+  if (fileButton) {
+    fileButton.style.display = "none";
+  }
+  if (elements.filePicker) {
+    elements.filePicker.style.display = "none";
+  }
+}
+
 function setStatus(message, tone = "neutral") {
   if (!elements.statusMessage) {
     return;
@@ -2353,14 +2368,13 @@ async function refreshData() {
   try {
     await loadFromProjectCsv();
   } catch (error) {
-    setStatus(
-      "Auto-load failed. Jika index.html dibuka langsung, gunakan Load CSV atau jalankan local server.",
-      "down"
-    );
+    setStatus("Gagal memuat data. Coba refresh lagi beberapa saat.", "down");
   } finally {
     setLoading(false);
   }
 }
+
+setupUiMode();
 
 elements.refreshButton.addEventListener("click", refreshData);
 elements.filePicker.addEventListener("change", (event) => {
