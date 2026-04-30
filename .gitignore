@@ -10,3 +10,6 @@ data/servers.csv.lock
 
 # Vercel
 .vercel/
+
+# Node
+node_modules/
