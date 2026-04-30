@@ -1,4 +1,5 @@
 const { getDatabase } = require("../_firebase");
+const https = require("node:https");
 
 const API_URL = "https://sa-mp.co.id/api/server.php";
 const USER_AGENT =
@@ -59,13 +60,45 @@ function normalizeRecords(payload, timestamp) {
 }
 
 async function fetchPayload() {
-  const response = await fetch(API_URL, {
-    headers: { "User-Agent": USER_AGENT },
+  return await new Promise((resolve, reject) => {
+    const request = https.request(
+      API_URL,
+      {
+        method: "GET",
+        headers: {
+          "User-Agent": USER_AGENT,
+          Accept: "application/json",
+        },
+        timeout: 30_000,
+      },
+      (response) => {
+        const chunks = [];
+        response.on("data", (chunk) => chunks.push(chunk));
+        response.on("end", () => {
+          const status = response.statusCode || 0;
+          const bodyText = Buffer.concat(chunks).toString("utf8");
+          if (status < 200 || status >= 300) {
+            const error = new Error(`Upstream HTTP ${status}`);
+            error.upstreamStatus = status;
+            error.upstreamBody = bodyText.slice(0, 300);
+            reject(error);
+            return;
+          }
+          try {
+            resolve(JSON.parse(bodyText));
+          } catch (parseError) {
+            const error = new Error("Upstream JSON parse failed");
+            error.cause = parseError;
+            error.upstreamBody = bodyText.slice(0, 300);
+            reject(error);
+          }
+        });
+      }
+    );
+    request.on("timeout", () => request.destroy(new Error("Upstream timeout")));
+    request.on("error", (error) => reject(error));
+    request.end();
   });
-  if (!response.ok) {
-    throw new Error(`Upstream HTTP ${response.status}`);
-  }
-  return await response.json();
 }
 
 module.exports = async (req, res) => {
@@ -100,7 +133,12 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ ok: true, timestamp, servers: records.length });
   } catch (error) {
+    console.error("Collect failed", {
+      message: error?.message,
+      upstreamStatus: error?.upstreamStatus,
+      upstreamBody: error?.upstreamBody,
+      stack: error?.stack,
+    });
     res.status(500).json({ ok: false, error: "Collect failed" });
   }
 };
-
