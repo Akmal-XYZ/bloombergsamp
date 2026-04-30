@@ -59,6 +59,10 @@ function normalizeRecords(payload, timestamp) {
   return records;
 }
 
+function toServerKey(ip, port) {
+  return `${String(ip).replaceAll(".", "_")}:${Number(port)}`;
+}
+
 async function fetchPayload() {
   return await new Promise((resolve, reject) => {
     const request = https.request(
@@ -120,7 +124,7 @@ module.exports = async (req, res) => {
 
     const serversById = {};
     for (const record of records) {
-      const id = `${record.ip}:${record.port}`;
+      const id = toServerKey(record.ip, record.port);
       serversById[id] = record;
     }
 

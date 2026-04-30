@@ -95,6 +95,10 @@ function normalizeRecords(payload, timestamp) {
   return records;
 }
 
+function toServerKey(ip, port) {
+  return `${String(ip).replaceAll(".", "_")}:${Number(port)}`;
+}
+
 async function deleteOldSnapshots(db, cutoffTimestamp) {
   const ref = db.ref("snapshots");
   const oldSnap = await ref.orderByKey().endAt(String(cutoffTimestamp)).limitToFirst(500).once("value");
@@ -117,7 +121,7 @@ async function main() {
 
   const serversById = {};
   for (const record of records) {
-    const id = `${record.ip}:${record.port}`;
+    const id = toServerKey(record.ip, record.port);
     serversById[id] = record;
   }
 
@@ -142,4 +146,3 @@ main().catch((error) => {
   console.error("Collect job failed", error);
   process.exit(1);
 });
-
