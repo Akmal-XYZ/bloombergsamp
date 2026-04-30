@@ -23,8 +23,8 @@ Important: Never commit the Firebase service account JSON to GitHub.
 
 ```text
 C:\Users\ADMIN\OneDrive\Pictures\bloombergsamp
-├── collector.py
-├── requirements.txt
+├── tools\
+│   └── collector.py
 ├── data\
 │   └── servers.csv
 ├── web\
@@ -60,21 +60,21 @@ The collector uses only the Python standard library (no pip dependencies require
 
 ```cmd
 cd C:\Users\ADMIN\OneDrive\Pictures\bloombergsamp
-python collector.py
+python tools\\collector.py
 ```
 
 ### Loop mode every 60 seconds
 
 ```cmd
 cd C:\Users\ADMIN\OneDrive\Pictures\bloombergsamp
-python collector.py --loop --interval 60
+python tools\\collector.py --loop --interval 60
 ```
 
 ### Loop mode every 10 minutes
 
 ```cmd
 cd C:\Users\ADMIN\OneDrive\Pictures\bloombergsamp
-python collector.py --loop --interval 600
+python tools\\collector.py --loop --interval 600
 ```
 
 ### Default profiles
@@ -83,14 +83,14 @@ Development defaults to 60 seconds:
 
 ```cmd
 cd C:\Users\ADMIN\OneDrive\Pictures\bloombergsamp
-python collector.py --loop --profile dev
+python tools\\collector.py --loop --profile dev
 ```
 
 Production defaults to 600 seconds:
 
 ```cmd
 cd C:\Users\ADMIN\OneDrive\Pictures\bloombergsamp
-python collector.py --loop --profile prod
+python tools\\collector.py --loop --profile prod
 ```
 
 ### Collector behavior
@@ -161,4 +161,4 @@ If your browser blocks auto-loading local files, click the `Load CSV` button and
 - The collector uses a small lock file (`data\servers.csv.lock`) to reduce append conflicts in OneDrive.
 - `data\servers.csv` grows over time because the collector appends historical snapshots instead of overwriting.
 - Existing CSV files remain compatible. Older rows keep the original format, while new rows can include the extra metadata columns.
-- If you want new data quickly while testing the UI, use `python collector.py --loop --interval 60`.
+- If you want new data quickly while testing the UI, use `python tools\\collector.py --loop --interval 60`.
