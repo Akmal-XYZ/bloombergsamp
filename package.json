@@ -1,0 +1,14 @@
+{
+  "name": "bloombergsamp",
+  "private": true,
+  "version": "0.0.0",
+  "description": "SA-MP analytics dashboard with Vercel serverless collector + Firebase RTDB storage.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.5.0"
+  }
+}
+

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+
+# Local collected data
+data/servers.csv
+data/servers.csv.lock
+
+# Firebase Admin SDK private keys (never commit)
+*-firebase-adminsdk-*.json
+
+# Vercel
+.vercel/
