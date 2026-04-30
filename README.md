@@ -7,17 +7,30 @@ This project collects SA-MP server data from `https://sa-mp.co.id/api/server.php
 This repo can be deployed to Vercel with serverless endpoints:
 
 - `GET /api/data.csv?range=24h` serves CSV for the dashboard (range options: `10m`, `1h`, `6h`, `12h`, `24h`, `7d`, `30d`).
-- `POST /api/cron/collect?secret=...` collects a snapshot from the upstream API and writes it into Firebase Realtime Database.
 
 Firebase RTDB rules can stay locked (`.read=false`, `.write=false`) because the serverless functions use Firebase Admin credentials.
+
+### Recommended: GitHub Actions collector (every 10 minutes)
+
+Vercel Functions may experience upstream timeouts depending on region/network. This repo includes a scheduled GitHub Actions workflow that collects snapshots and writes them to RTDB:
+
+- Workflow: `.github/workflows/collect.yml`
+- Script: `tools/collect_to_rtdb.js`
+- Retention: keeps the latest 30 days of snapshots (older snapshots are deleted)
 
 ### Required Vercel Environment Variables
 
 - `FIREBASE_DATABASE_URL` = `https://seadata-29809-default-rtdb.firebaseio.com`
 - `FIREBASE_SERVICE_ACCOUNT_B64` = Base64 of the Firebase service account JSON file
-- `CRON_SECRET` = a random secret used to protect `/api/cron/collect`
 
 Important: Never commit the Firebase service account JSON to GitHub.
+
+### Required GitHub Actions Secrets
+
+Set these repository secrets so the scheduled collector can write to Firebase:
+
+- `FIREBASE_DATABASE_URL`
+- `FIREBASE_SERVICE_ACCOUNT_B64`
 
 ## Project Structure
 
