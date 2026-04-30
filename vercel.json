@@ -1,8 +1,11 @@
 {
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "web/**", "use": "@vercel/static" }
+  ],
   "routes": [
     { "handle": "filesystem" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/(.*)", "dest": "/web/$1" }
   ]
 }
-
