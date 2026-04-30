@@ -5,6 +5,8 @@
   ],
   "routes": [
     { "handle": "filesystem" },
+    { "src": "/api/data\\.csv", "dest": "/api/data.csv.js" },
+    { "src": "/api/cron/collect", "dest": "/api/cron/collect.js" },
     { "src": "/(?!api/)(.*)", "dest": "/web/$1" }
   ]
 }
