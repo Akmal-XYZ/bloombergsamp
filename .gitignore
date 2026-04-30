@@ -13,3 +13,5 @@ data/servers.csv.lock
 
 # Node
 node_modules/
+
+.vercel

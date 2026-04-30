@@ -50,10 +50,9 @@ Open Command Prompt and run:
 
 ```cmd
 cd C:\Users\ADMIN\OneDrive\Pictures\bloombergsamp
-python -m pip install -r requirements.txt
 ```
 
-`requirements.txt` is intentionally empty because the collector uses only the Python standard library.
+The collector uses only the Python standard library (no pip dependencies required).
 
 ## Run The Collector
 
