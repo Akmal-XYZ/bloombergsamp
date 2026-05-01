@@ -12,6 +12,10 @@ function requireCronSecret(req) {
   if (!expected) {
     return { ok: false, status: 500, message: "Missing CRON_SECRET" };
   }
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  if (typeof authHeader === "string" && authHeader === `Bearer ${expected}`) {
+    return { ok: true };
+  }
   const provided =
     req.headers["x-cron-secret"] ||
     req.headers["x-cron-token"] ||

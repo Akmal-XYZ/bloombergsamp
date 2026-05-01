@@ -12,7 +12,9 @@ Firebase RTDB rules can stay locked (`.read=false`, `.write=false`) because the 
 
 ### Recommended: GitHub Actions collector (every 10 minutes)
 
-Vercel Functions may experience upstream timeouts depending on region/network. This repo includes a scheduled GitHub Actions workflow that collects snapshots and writes them to RTDB:
+Vercel Cron Jobs are configured in `vercel.json` to hit `/api/cron/collect` every 10 minutes (production only).
+
+If you prefer collecting from GitHub Actions (for debugging), this repo also includes a manual workflow that collects snapshots and writes them to RTDB:
 
 - Workflow: `.github/workflows/collect.yml`
 - Script: `tools/collect_to_rtdb.js`
@@ -22,6 +24,7 @@ Vercel Functions may experience upstream timeouts depending on region/network. T
 
 - `FIREBASE_DATABASE_URL` = `https://seadata-29809-default-rtdb.firebaseio.com`
 - `FIREBASE_SERVICE_ACCOUNT_B64` = Base64 of the Firebase service account JSON file
+- `CRON_SECRET` = random secret used by Vercel Cron Jobs (Authorization header)
 
 Important: Never commit the Firebase service account JSON to GitHub.
 
