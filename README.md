@@ -12,9 +12,7 @@ Firebase RTDB rules can stay locked (`.read=false`, `.write=false`) because the 
 
 ### Recommended: GitHub Actions collector (every 10 minutes)
 
-Vercel Cron Jobs are configured in `vercel.json` to hit `/api/cron/collect` every 10 minutes (production only).
-
-If you prefer collecting from GitHub Actions (for debugging), this repo also includes a manual workflow that collects snapshots and writes them to RTDB:
+This repo uses a scheduled GitHub Actions workflow to collect snapshots every 10 minutes and write them to RTDB:
 
 - Workflow: `.github/workflows/collect.yml`
 - Script: `tools/collect_to_rtdb.js`

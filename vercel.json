@@ -4,12 +4,6 @@
     { "src": "api/**/*.js", "use": "@vercel/node" },
     { "src": "web/**", "use": "@vercel/static" }
   ],
-  "crons": [
-    {
-      "path": "/api/cron/collect",
-      "schedule": "*/10 * * * *"
-    }
-  ],
   "routes": [
     { "handle": "filesystem" },
     { "src": "/api/data\\.csv", "dest": "/api/data.csv.js" },

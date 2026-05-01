@@ -1,6 +1,8 @@
 name: Collect SA-MP snapshot
 
 on:
+  schedule:
+    - cron: "*/10 * * * *"
   workflow_dispatch: {}
 
 jobs:
