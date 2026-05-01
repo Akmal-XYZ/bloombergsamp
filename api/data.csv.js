@@ -1,5 +1,6 @@
 const { getDatabase } = require("./_firebase");
 const { rateLimit } = require("./_rateLimit");
+const { collectOnce } = require("./_collector");
 
 const RANGE_SECONDS = {
   "10m": 10 * 60,
@@ -65,6 +66,38 @@ module.exports = async (req, res) => {
 
   try {
     const db = getDatabase();
+
+    // Self-healing collector: if data is stale, attempt to collect at most once per 10 minutes globally.
+    // This avoids relying solely on external schedulers while still protecting the upstream API.
+    const latestSnap = await db.ref("latest/timestamp").once("value");
+    const latestTimestamp = Number(latestSnap.val() || 0);
+    const isStale = !latestTimestamp || nowSeconds - latestTimestamp >= 600;
+
+    if (isStale) {
+      const lockRef = db.ref("locks/collect");
+      const lockResult = await lockRef.transaction((current) => {
+        const currentTs = Number(current || 0);
+        if (currentTs && nowSeconds - currentTs < 90) {
+          return;
+        }
+        return nowSeconds;
+      });
+
+      if (lockResult.committed) {
+        try {
+          const latestAfter = await db.ref("latest/timestamp").once("value");
+          const latestAfterTs = Number(latestAfter.val() || 0);
+          if (!latestAfterTs || nowSeconds - latestAfterTs >= 600) {
+            await collectOnce(db, { timeoutMs: 35_000 });
+          }
+        } catch (error) {
+          console.error("Auto-collect failed", { message: error?.message, stack: error?.stack });
+        } finally {
+          await lockRef.set(null);
+        }
+      }
+    }
+
     const snapshotsRef = db
       .ref("snapshots")
       .orderByKey()
@@ -94,4 +127,3 @@ module.exports = async (req, res) => {
     res.status(500).send("Failed to read data");
   }
 };
-
