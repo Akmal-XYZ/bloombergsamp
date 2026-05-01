@@ -1,12 +1,17 @@
-name: Collect SA-MP snapshot
+name: Collect SA-MP snapshot (schedule)
 
 on:
-  workflow_dispatch: {}
+  schedule:
+    - cron: "*/10 * * * *"
+
+concurrency:
+  group: samp-collector-schedule
+  cancel-in-progress: false
 
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,3 +22,4 @@ jobs:
         env:
           FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
           FIREBASE_SERVICE_ACCOUNT_B64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_B64 }}
+
