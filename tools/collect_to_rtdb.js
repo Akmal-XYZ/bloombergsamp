@@ -140,6 +140,13 @@ async function main() {
   }
 
   console.log(JSON.stringify({ ok: true, timestamp, servers: records.length, deletedSnapshots: deleted }));
+
+  // Ensure the process can exit cleanly on GitHub Actions runners.
+  try {
+    await admin.app().delete();
+  } catch {
+    // Ignore: best-effort cleanup.
+  }
 }
 
 main().catch((error) => {
