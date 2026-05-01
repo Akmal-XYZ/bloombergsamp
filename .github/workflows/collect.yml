@@ -1,19 +1,33 @@
 name: Collect SA-MP snapshot
 
 on:
+  schedule:
+    - cron: "*/5 * * * *"
   workflow_dispatch: {}
+
+concurrency:
+  group: samp-collector-schedule
+  cancel-in-progress: false
 
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
       - run: npm ci
-      - run: node tools/collect_to_rtdb.js
+      - name: Collect every 1 minute (5x)
+        run: |
+          for i in 1 2 3 4 5; do
+            echo "Collect attempt $i/5"
+            node tools/collect_to_rtdb.js
+            if [ "$i" != "5" ]; then
+              sleep 60
+            fi
+          done
         env:
           FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
           FIREBASE_SERVICE_ACCOUNT_B64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_B64 }}
